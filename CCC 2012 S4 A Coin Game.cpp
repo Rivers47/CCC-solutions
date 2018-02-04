@@ -29,9 +29,7 @@ struct configuration
 	}
 	bool operator == (const configuration& a)
 	{
-		if (s == a.s)
-			return true;
-		return false;
+		return s == a.s；
 	}
 	bool operator < (const configuration& a) const
 	{
