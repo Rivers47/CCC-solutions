@@ -1,10 +1,11 @@
+
 //#define TEST
 #include <cassert>
 #include <iostream>
 #include <cstdio>
 #include <cstring>
 #define maxn 100
-
+#define goAll(x,y,step) go(x, y - 1, step);go(x, y + 1, step);go(x - 1, y, step);go(x + 1, y, step);
 using namespace std;
 int N, M;
 char grid[maxn][maxn];
@@ -21,11 +22,6 @@ int steps[maxn][maxn];
 走完后对比地图输出所有数
 */
 
-void ini()
-{
-	for (int i = 0; i < N; i++)
-		memset(steps[i], 0, M);
-}
 #ifdef TEST
 void print(int c)
 {
@@ -103,13 +99,9 @@ void markCamera(int i, int k)//上下左右四个循环
 void clearCamera(int x, int y)
 {
 	for (int i = 0; i < N; i++)
-	{
 		for (int k = 0; k < M; k++)
-		{
 			if (grid[i][k] == 'C')
 				markCamera(i, k);
-		}
-	}
 
 	for (int i = x, k = y + 1;; k++)
 		if (grid[i][k] == 'C')
@@ -153,31 +145,35 @@ void clearCamera(int x, int y)
 			continue;
 }
 
+
+/*
+Recursively go through the whole grid
+*/
 bool stuck = false;
-void go1(int x, int y, int step);
-void go(int x, int y, int step)	//递归走格子
+void go(int x, int y, int step)
 {
-	
 	char tgrid = grid[x][y];
 	if (tgrid == '.')
 	{
-		if (steps[x][y] == 0 || steps[x][y] > step)	//如果应该走
-		{
-			stuck = false;
-			steps[x][y] = step;
-			go1(x, y, step + 1);
-		}
 		stuck = false;
+		//if current step is less than the marked step, or this cell hasn't been asscessed
+		if (steps[x][y] > step || steps[x][y] == 0)
+		{	
+			steps[x][y] = step;
+			goAll(x, y, step + 1);
+		}
 		return;
 	}
-	else
+	else	
 	{
+		//W and C always go here because they are all -1
 		if (stuck && steps[x][y] <= step && steps[x][y] != 0)
 		{
 			stuck = false;
 			return;
 		}
-		stuck = true;
+		
+		stuck = true;	
 		steps[x][y] = step;
 		switch (tgrid)
 		{
@@ -198,44 +194,36 @@ void go(int x, int y, int step)	//递归走格子
 	}
 	return;
 }
-//第一次call的时候step=1
-void go1(int x, int y, int step)
-{
-	go(x, y - 1, step);
-	go(x, y + 1, step);
-	go(x - 1, y, step);
-	go(x + 1, y, step);
-}
 
 
 int main()
 {
 	cin.tie(0); cin.sync_with_stdio(0);
 	cin >> N >> M;
-	ini();	//mark steps to all 0
+
+	//mark steps to all 0
+	for (int i = 0; i < N; i++)
+		memset(steps[i], 0, M);
+
 	char a;
 	int x, y;	//the position of S
 	for (int i = 0; i < N; i++)
-	{
 		for (int k = 0; k < M; k++)
 		{
 			cin >> a;
-			if (a == 'S')
-			{
-				x = i;
-				y = k;
-			}
+			if (a == 'S') { x = i; y = k; }
 			grid[i][k] = a;
-			if (a == 'W' || a == 'C')
+			if (a == 'W' || a == 'C')	//mark all the walls and cameras to -1
 				steps[i][k] = -1;
 		}
-	}
+
+	//clear all the places under cameras
 	clearCamera(x, y);
 #ifdef TEST
 	print(0);
 	print(1);
 #endif
-	if (steps[x][y] == -1)	//if it's already under a camera...
+	if (steps[x][y] == -1)	//if S is already under a camera...
 	{
 		for (int i = 1; i < N - 1; i++)
 			for (int k = 1; k < M - 1; k++)
@@ -244,7 +232,7 @@ int main()
 		return 0;
 	}
 	steps[x][y] = -1;
-	go1(x, y, 1);
+	goAll(x, y, 1);
 
 	for (int i = 1; i < N - 1; i++)
 		for (int k = 1; k < M - 1; k++)
