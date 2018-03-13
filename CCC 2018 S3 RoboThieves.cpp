@@ -1,4 +1,3 @@
-
 //#define TEST
 #include <cassert>
 #include <iostream>
@@ -18,71 +17,53 @@ void print(int c)
 		for (int i = 0; i < N; i++)
 		{
 			for (int k = 0; k < M; k++)
-			{
 				if (steps[i][k] == -1)
 					cout << " x";
 				else
 					printf("%2d", steps[i][k]);
-			}
 			cout << '\n';
 		}
 	else
 		for (int i = 0; i < N; i++)
 		{
 			for (int k = 0; k < M; k++)
-			{
 				cout << grid[i][k];
-			}
 			cout << '\n';
 		}
 	cout << '\n';
 }
 #endif
-void markCamera(int i, int k)//上下左右四个循环
+void markCamera(int i, int k)//four loops for the four directions
 {
 
 	for (int k1 = k + 1; ; k1++)
-	{
 		if (grid[i][k1] == '.')
 			steps[i][k1] = -1;
 		else if (grid[i][k1] == 'W')
 			break;
-		else	//其他的(S,C,UDLR)都可以穿过
+		else	//The other ones(S,C,UDLR)can all be seen through
 			continue;
-	}
 	for (int k1 = k - 1; ; k1--)
-	{
 		if (grid[i][k1] == '.')
-		{
 			steps[i][k1] = -1;
-		}
 		else if (grid[i][k1] == 'W')
 			break;
-		else	//其他的(S,C,UDLR)都可以穿
+		else
 			continue;
-	}
 	for (int i1 = i + 1; ; i1++)
-	{
 		if (grid[i1][k] == '.')
-		{
 			steps[i1][k] = -1;
-		}
 		else if (grid[i1][k] == 'W')
 			break;
-		else	//其他的(S,C,UDLR)都可以穿过
+		else
 			continue;
-	}
 	for (int i1 = i - 1; ; i1--)
-	{
 		if (grid[i1][k] == '.')
-		{
 			steps[i1][k] = -1;
-		}
 		else if (grid[i1][k] == 'W')
 			break;
-		else	//其他的(S,C,UDLR)都可以穿过
+		else
 			continue;
-	}
 }
 
 void clearCamera(int x, int y)
@@ -92,6 +73,7 @@ void clearCamera(int x, int y)
 			if (grid[i][k] == 'C')
 				markCamera(i, k);
 
+	//a special case when S is already under a camera
 	for (int i = x, k = y + 1;; k++)
 		if (grid[i][k] == 'C')
 		{
