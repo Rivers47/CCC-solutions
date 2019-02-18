@@ -35,7 +35,7 @@ bool cut(int previous, int current, int distance)
     if (roads.at(current).size() > 1 || *roads.at(current).begin() != previous) //if this is not a leaf
     {
         bool noPhos = true; //no subtree of this node has phos
-        for (auto next : set<int>(roads[current]))
+        for (auto &next : set<int>(roads[current]))
             if (next != previous && cut(current, next, distance + 1)) //if next subtree is completely useless
                 noPhos = false;
 
@@ -82,9 +82,9 @@ bool cut(int previous, int current, int distance)
 //dfs find the longest path in the tree
 void findFar(int previous = -1, int current = farNode, int distance = 0)
 {
-    for (auto next : roads[current])
+    for (auto &next : roads[current])
         if (next != previous)
-            cut(current, next, distance + 1);
+            findFar(current, next, distance+1);
 
     if (distance > maxDistance)
         maxDistance = distance;
